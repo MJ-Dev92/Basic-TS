@@ -1,19 +1,4 @@
-// const person: {
-//   name: string;
-//   age: number;
-// } = {
-const person = {
-  name: "Maximilian",
-  age: 30,
-  hobbies: ["Sports", "Cooking"],
-};
-
-let favoriteActivities: string[];
-favoriteActivities = ["Sports"];
-
-console.log(person.name);
-
-for (const hobby of person.hobbies) {
-  console.log(hobby.toUpperCase());
-  // console.log(hobby.map()); // Error
+function combine(n1: number, n2: number) {
+  const result = n1 + n2;
+  return result;
 }
