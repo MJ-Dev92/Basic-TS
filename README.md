@@ -290,3 +290,154 @@ for (const hobby of person.hobbies) {
 
 - toUpperCase() 메소드를 써도 자동완성도 작동하고 타입스크립트 에러도 발생하지 않음
 - 타입스크립트가 hobbies가 이를 문자열의 배열 타입이라고 이해하기 때문이다
+
+# 19. 튜플 작업하기
+
+| number  | 1, 5.3, -10      | All numbers, no differentiation between integers or floats                         |
+| ------- | ---------------- | ---------------------------------------------------------------------------------- |
+| string  | ‘Hi’, “Hi”, `Hi` | All text values                                                                    |
+| boolean | true, false      | Just these two, no “truthy” or “falsy” values                                      |
+| object  | {age: 30}        | Any JavaScript object, more specific types (type of obkject) are possible          |
+| Array   | [1, 2, 3]        | Any JavaScript array, type can be flexible or strict (regarding the element types) |
+| Tuple   | [1, 2]           | Added by TypeScript: Fixed-length array and Type                                   |
+
+```tsx
+const person = {
+  name: "Maximilian",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: [2, "author"],
+};
+
+person.role.push("admin");
+person.role[1] = 10;
+```
+
+- 2개의 요소 중 첫 번째는 요소는 숫자, 두 번째 요소는 문자열이어야 한다는걸 타입스크립트는 알지 못한다.
+- 이때 튜플을 사용하면 좋다. 어떤 role이어야 하는지 role의 타입을 명시적으로 설정함으로써 타입스크립트에게 인식을 시켜야한다.
+
+```tsx
+const person: {
+  name: string;
+  age: number;
+  hobbies: string[];
+  role: [number, string];
+} = {
+  name: "Maximilian",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: [2, "author"],
+};
+
+person.role.push("admin");
+person.role[1] = 10; // 배열[1]은 문자열이기 떄문에 error가 뜬다.
+
+person.role = [0, "admin", "user"]; // 인덱스[2]에는 타입이 정해지지 않아 error가 뜬다. 길이도 고정된다.
+```
+
+- push가 이루어지는 이유는 role에는 정확히 두 개의 요소만 있어야 한다는 게 성립이 됐기 때문이다.
+- push는 예외적으로 튜플에서 허용되기에 안타깝게도 타입스크립트가 이런 에러를 걸러내질 못하지만 적어도 잘못된 값을 할당하지는 않는다.
+- 배열에 정확히 x개의 값이 필요하고 각 값의 타입을 미리 알고 있는 상황에서는 배열보다는 튜플을 사용하여 작업 중인 데이터 타입과 알고 있는 상황에서는 배열보다는 튜플을 사용하여 작업 중인 데이터 타입과 예상되는 데이터 타입을 보다 명확하게 파악할 수 있다.
+
+# 20. 열거형으로 작업하기
+
+<aside>
+📌 Enum이란 숫자로 표혀
+
+</aside>
+
+| number  | 1, 5.3, -10      | All numbers, no differentiation between integers or floats                         |
+| ------- | ---------------- | ---------------------------------------------------------------------------------- |
+| string  | ‘Hi’, “Hi”, `Hi` | All text values                                                                    |
+| boolean | true, false      | Just these two, no “truthy” or “falsy” values                                      |
+| object  | {age: 30}        | Any JavaScript object, more specific types (type of obkject) are possible          |
+| Array   | [1, 2, 3]        | Any JavaScript array, type can be flexible or strict (regarding the element types) |
+| Tuple   | [1, 2]           | Added by TypeScript: Fixed-length array and Type                                   |
+| Enum    | enum {NEW, OLD}  | Added by TypeScript: Automatically enumerated global constant identifiers          |
+
+- Enum 라벨들은 0부터 시작하는 숫자로 변환된다.
+
+```tsx
+const ADMIN = 0;
+const READ_ONLY = 1;
+const AUTHOR = 2;
+// 자바스크립트 경우 보통 전역 상수를 정의해서 관리한다.
+
+const person = {
+  name: "Maximilian",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: ADMIN,
+};
+
+if (person.role === ADMIN) {
+  console.log("is read only");
+}
+```
+
+- enum 키워드로 enum을 생성하는데 키워드를 대문자로 시작하는 Role로 지정한다.
+- enum은 사용자 지정 타입이기 때문에 중괄호 쌍과 쌍반점을 입력한다.
+
+```tsx
+enum Role {
+  ADMIN,
+  READ_ONLY,
+  AUTHOR,
+}
+
+const person = {
+  name: "Maximilian",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: Role.ADMIN,
+};
+
+if (person.role === Role.ADMIN) {
+  console.log("is read only");
+}
+```
+
+- enum의 경우, 기본 동작에 국한되지 않는다. 특정 이유로 시작 숫자를 0으로 시작하지 않으려는 경우, 식별자에 등호를 추가하여 다른 숫자를 입력할 수 있다.
+
+```tsx
+enum Role {
+  ADMIN = "ADMIN",
+  READ_ONLY = 100,
+  AUTHOR = 500,
+}
+
+const person = {
+  name: "Maximilian",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: Role.ADMIN,
+};
+
+if (person.role === Role.ADMIN) {
+  console.log("is read only");
+}
+```
+
+- 기본값은 0 이지만 숫자를 지정할 수 있고 첫번 째 숫자만 지정한 경우 다음 값부터 증가하는 숫자를 가질 수 있다.
+- 또한 고유한 숫자와, 문자도 가능하다.
+
+# 21. Any 타입
+
+<aside>
+📌 Any 타입은 타입스크립트에서 할당할 수 있는 타입 중 가장 유연한 타입이다. 이 타입은 타입스크립트에 어떤 것도 이해시키지 않는다. 따라서 모든 종류의 값을 저장할 수 있다.
+
+</aside>
+
+| number  | 1, 5.3, -10      | All numbers, no differentiation between integers or floats                         |
+| ------- | ---------------- | ---------------------------------------------------------------------------------- |
+| string  | ‘Hi’, “Hi”, `Hi` | All text values                                                                    |
+| boolean | true, false      | Just these two, no “truthy” or “falsy” values                                      |
+| object  | {age: 30}        | Any JavaScript object, more specific types (type of obkject) are possible          |
+| Array   | [1, 2, 3]        | Any JavaScript array, type can be flexible or strict (regarding the element types) |
+| Tuple   | [1, 2]           | Added by TypeScript: Fixed-length array and Type                                   |
+| Enum    | enum {NEW, OLD}  | Added by TypeScript: Automatically enumerated global constant identifiers          |
+| Any     | \*               | Any kind of value, no specific type assignment                                     |
+
+- any는 아주 유연하고 훌륭한 타입 같지만 큰 단점 때문에 가능한 한 any를 쓰지 않는게 좋다.
+- 이는 타입스크립트가 주는 모든 장점을 any가 상쇄시켜 바닐라 자바스크립트를 쓰는 것과 다를 바 없게 되기 때문이다.
+- any 타입을 사용하는 모든 위치에서는 타입스크립트 컴파일러가 작동을 하지않게 되기 때문에 어떤 값이나 종류의 데이터가 어디에 저장될지 전혀 알 수 없는 경우에 대비하거나 런타임 검사를 수행하는 경우 특정 값에 수행하고자 하는 작업의 범위를 좁히기 위해 any를 사용하면 된다.
